@@ -1,7 +1,7 @@
 {
   "name": "@lexmata/bitbucket-mcp",
   "version": "1.0.0",
-  "description": "MCP (Model Context Protocol) server for Bitbucket Cloud with full API coverage",
+  "description": "MCP (Model Context Protocol) server for Bitbucket Cloud - 25+ tools for repositories, pull requests, branches, commits, issues, pipelines, and code search",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -27,11 +27,15 @@
     "mcp",
     "model-context-protocol",
     "bitbucket",
+    "bitbucket-cloud",
     "atlassian",
     "api",
     "claude",
     "ai",
-    "llm"
+    "llm",
+    "typescript",
+    "oauth2",
+    "developer-tools"
   ],
   "author": "Lexmata LLC",
   "license": "MIT",

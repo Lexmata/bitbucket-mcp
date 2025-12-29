@@ -1,6 +1,12 @@
 # @lexmata/bitbucket-mcp
 
-A Model Context Protocol (MCP) server for Bitbucket Cloud, providing comprehensive access to repositories, pull requests, branches, commits, issues, pipelines, and code search.
+[![npm version](https://img.shields.io/npm/v/@lexmata/bitbucket-mcp.svg)](https://www.npmjs.com/package/@lexmata/bitbucket-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![GitHub stars](https://img.shields.io/github/stars/lexmata/bitbucket-mcp.svg?style=social)](https://github.com/lexmata/bitbucket-mcp)
+
+A Model Context Protocol (MCP) server for Bitbucket Cloud - 25+ tools for repositories, pull requests, branches, commits, issues, pipelines, and code search.
 
 ## Features
 
