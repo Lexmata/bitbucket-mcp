@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitbucket MCP Server - Documentation</title>
+  <meta name="description" content="MCP server for Bitbucket Cloud with full API coverage for repositories, pull requests, branches, commits, issues, and pipelines.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bitbucket: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#2684ff',
+              600: '#0052cc',
+              700: '#0747a6',
+              800: '#1e3a5f',
+              900: '#172b4d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .code-block {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #2684ff 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+  <!-- Dark Mode Toggle -->
+  <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+    <svg id="sun-icon" class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+    </svg>
+    <svg id="moon-icon" class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+    </svg>
+  </button>
+
+  <!-- Hero Section -->
+  <header class="relative overflow-hidden bg-gradient-to-br from-bitbucket-600 via-bitbucket-700 to-bitbucket-900 text-white">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    <div class="container mx-auto px-6 py-24 relative">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
+          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+          MCP Server for Bitbucket Cloud
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold mb-6">
+          @lexmata/bitbucket-mcp
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-100 mb-10 max-w-2xl mx-auto">
+          A comprehensive Model Context Protocol server for Bitbucket Cloud with full API coverage
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#installation" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-bitbucket-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Get Started
+          </a>
+          <a href="https://github.com/lexmata/bitbucket-mcp" class="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"></div>
+  </header>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-slate-50 dark:bg-slate-800/50">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Features</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">Everything you need to interact with Bitbucket Cloud through the Model Context Protocol</p>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-bitbucket-100 dark:bg-bitbucket-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-bitbucket-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Repository Management</h3>
+          <p class="text-slate-600 dark:text-slate-400">Create, list, update, and delete repositories. Manage forks and access file contents.</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Pull Requests</h3>
+          <p class="text-slate-600 dark:text-slate-400">Full PR lifecycle management including creation, reviews, comments, and merging.</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Issues & Tracking</h3>
+          <p class="text-slate-600 dark:text-slate-400">Create and manage issues with full support for priorities, assignees, and states.</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Pipelines CI/CD</h3>
+          <p class="text-slate-600 dark:text-slate-400">Trigger, monitor, and control pipeline runs for automated builds and deployments.</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Code Search</h3>
+          <p class="text-slate-600 dark:text-slate-400">Search across all repositories in your workspace to find code and references.</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900/50 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">OAuth 2.0 Security</h3>
+          <p class="text-slate-600 dark:text-slate-400">Secure authentication with automatic token refresh for uninterrupted access.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Section -->
+  <section id="installation" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Installation</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">Get started in minutes with your preferred package manager</p>
+      <div class="max-w-3xl mx-auto">
+        <div class="code-block rounded-xl p-6 shadow-xl">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="ml-4 text-slate-400 text-sm">Terminal</span>
+          </div>
+          <pre class="text-green-400 font-mono text-sm overflow-x-auto"><code><span class="text-slate-500"># Using npm</span>
+npm install -g @lexmata/bitbucket-mcp
+
+<span class="text-slate-500"># Using pnpm</span>
+pnpm add -g @lexmata/bitbucket-mcp
+
+<span class="text-slate-500"># Using yarn</span>
+yarn global add @lexmata/bitbucket-mcp</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Configuration Section -->
+  <section id="configuration" class="py-20 bg-slate-50 dark:bg-slate-800/50">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Configuration</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">Set up authentication to connect to your Bitbucket Cloud workspace</p>
+      <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 bg-bitbucket-100 dark:bg-bitbucket-900/50 rounded-lg flex items-center justify-center text-bitbucket-600 text-sm font-bold">1</span>
+            Access Token (Recommended)
+          </h3>
+          <ol class="space-y-3 text-slate-600 dark:text-slate-400">
+            <li>1. Go to Bitbucket Settings &gt; App passwords</li>
+            <li>2. Create a new app password with required permissions</li>
+            <li>3. Set the environment variable:</li>
+          </ol>
+          <div class="code-block rounded-lg p-4 mt-4">
+            <code class="text-green-400 font-mono text-sm">export BITBUCKET_ACCESS_TOKEN="your-token"</code>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 bg-bitbucket-100 dark:bg-bitbucket-900/50 rounded-lg flex items-center justify-center text-bitbucket-600 text-sm font-bold">2</span>
+            OAuth 2.0 (For Apps)
+          </h3>
+          <ol class="space-y-3 text-slate-600 dark:text-slate-400">
+            <li>1. Go to Workspace Settings &gt; OAuth consumers</li>
+            <li>2. Create a new OAuth consumer</li>
+            <li>3. Set the environment variables:</li>
+          </ol>
+          <div class="code-block rounded-lg p-4 mt-4">
+            <code class="text-green-400 font-mono text-sm">export BITBUCKET_CLIENT_ID="your-id"
+export BITBUCKET_CLIENT_SECRET="your-secret"</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Claude Desktop Section -->
+  <section id="claude-desktop" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Usage with Claude Desktop</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">Add the server to your Claude Desktop configuration</p>
+      <div class="max-w-3xl mx-auto">
+        <div class="code-block rounded-xl p-6 shadow-xl">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="ml-4 text-slate-400 text-sm">claude_desktop_config.json</span>
+          </div>
+          <pre class="text-slate-300 font-mono text-sm overflow-x-auto"><code>{
+  <span class="text-blue-400">"mcpServers"</span>: {
+    <span class="text-blue-400">"bitbucket"</span>: {
+      <span class="text-blue-400">"command"</span>: <span class="text-green-400">"npx"</span>,
+      <span class="text-blue-400">"args"</span>: [<span class="text-green-400">"@lexmata/bitbucket-mcp"</span>],
+      <span class="text-blue-400">"env"</span>: {
+        <span class="text-blue-400">"BITBUCKET_ACCESS_TOKEN"</span>: <span class="text-green-400">"your-access-token"</span>
+      }
+    }
+  }
+}</code></pre>
+        </div>
+        <div class="mt-6 grid grid-cols-3 gap-4 text-center text-sm text-slate-600 dark:text-slate-400">
+          <div class="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
+            <strong class="block text-slate-900 dark:text-white">macOS</strong>
+            ~/Library/Application Support/Claude/
+          </div>
+          <div class="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
+            <strong class="block text-slate-900 dark:text-white">Windows</strong>
+            %APPDATA%\Claude\
+          </div>
+          <div class="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
+            <strong class="block text-slate-900 dark:text-white">Linux</strong>
+            ~/.config/Claude/
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section id="tools" class="py-20 bg-slate-50 dark:bg-slate-800/50">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Available Tools</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">25+ tools covering all major Bitbucket operations</p>
+      <div class="max-w-6xl mx-auto">
+        <!-- Tabs -->
+        <div class="flex flex-wrap justify-center gap-2 mb-8">
+          <button class="tool-tab active px-4 py-2 rounded-lg font-medium transition-colors bg-bitbucket-600 text-white" data-tab="repositories">Repositories</button>
+          <button class="tool-tab px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600" data-tab="pullrequests">Pull Requests</button>
+          <button class="tool-tab px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600" data-tab="branches">Branches</button>
+          <button class="tool-tab px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600" data-tab="commits">Commits</button>
+          <button class="tool-tab px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600" data-tab="issues">Issues</button>
+          <button class="tool-tab px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600" data-tab="pipelines">Pipelines</button>
+        </div>
+
+        <!-- Tool Lists -->
+        <div id="tab-repositories" class="tool-content">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_repositories</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List repositories in a workspace</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_repository</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a specific repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">create_repository</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Create a new repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">delete_repository</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Delete a repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_repository_forks</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List all forks of a repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_file_content</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get the content of a file</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-pullrequests" class="tool-content hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_pull_requests</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List pull requests with optional filtering</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a specific pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">create_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Create a new pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">update_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Update a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">merge_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Merge a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">decline_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Decline a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">approve_pull_request</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Approve a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">request_changes</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Request changes on a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_pr_comments</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List comments on a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">add_pr_comment</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Add a comment to a pull request</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_pr_diff</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get the diff for a pull request</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-branches" class="tool-content hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_branches</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List branches in a repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_branch</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a specific branch</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">create_branch</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Create a new branch</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">delete_branch</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Delete a branch</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-commits" class="tool-content hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_commits</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List commits with optional filtering</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_commit</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a specific commit</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_commit_diff</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get the diff for a commit</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-issues" class="tool-content hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_issues</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List issues in a repository</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_issue</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a specific issue</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">create_issue</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Create a new issue</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">update_issue</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Update an issue</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">delete_issue</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Delete an issue</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-pipelines" class="tool-content hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Tool</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">list_pipelines</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">List pipeline runs</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">get_pipeline</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Get details of a pipeline run</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">trigger_pipeline</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Trigger a new pipeline run</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">stop_pipeline</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Stop a running pipeline</td></tr>
+                <tr><td class="px-6 py-4 font-mono text-sm text-bitbucket-600">search_code</td><td class="px-6 py-4 text-slate-600 dark:text-slate-400">Search code across repositories</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section id="resources" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">MCP Resources</h2>
+      <p class="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">Access Bitbucket data through standardized resource URIs</p>
+      <div class="max-w-4xl mx-auto grid gap-6">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-bitbucket-100 dark:bg-bitbucket-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-bitbucket-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-1">Repository</h3>
+              <code class="text-sm bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg">bitbucket://repository/{workspace}/{repo}</code>
+              <p class="text-slate-600 dark:text-slate-400 mt-2">Access repository metadata, settings, and configuration</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-1">Pull Request</h3>
+              <code class="text-sm bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg">bitbucket://pullrequest/{workspace}/{repo}/{id}</code>
+              <p class="text-slate-600 dark:text-slate-400 mt-2">Access pull request details, status, and metadata</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-1">File</h3>
+              <code class="text-sm bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg">bitbucket://file/{workspace}/{repo}/{path}</code>
+              <p class="text-slate-600 dark:text-slate-400 mt-2">Access file contents from any branch or commit</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white py-12">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+          <h3 class="text-xl font-bold mb-2">@lexmata/bitbucket-mcp</h3>
+          <p class="text-slate-400">MCP server for Bitbucket Cloud</p>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="https://github.com/lexmata/bitbucket-mcp" class="text-slate-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://www.npmjs.com/package/@lexmata/bitbucket-mcp" class="text-slate-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+        <p>MIT License - Copyright &copy; 2025 Lexmata LLC</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+
+    // Check for saved theme preference or system preference
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    // Tool tabs
+    const tabs = document.querySelectorAll('.tool-tab');
+    const contents = document.querySelectorAll('.tool-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+
+        // Update tab styles
+        tabs.forEach(t => {
+          t.classList.remove('bg-bitbucket-600', 'text-white');
+          t.classList.add('bg-slate-200', 'dark:bg-slate-700');
+        });
+        tab.classList.remove('bg-slate-200', 'dark:bg-slate-700');
+        tab.classList.add('bg-bitbucket-600', 'text-white');
+
+        // Show/hide content
+        contents.forEach(content => {
+          content.classList.add('hidden');
+        });
+        document.getElementById(`tab-${target}`).classList.remove('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Run type checking before push
+echo "Running type check..."
+pnpm run typecheck
+
+# Run linting before push
+echo "Running lint..."
+pnpm run lint
+
+# Run build to ensure it compiles
+echo "Running build..."
+pnpm run build
+
+echo "All checks passed!"

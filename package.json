@@ -1,0 +1,77 @@
+{
+  "name": "@lexmata/bitbucket-mcp",
+  "version": "1.0.0",
+  "description": "MCP (Model Context Protocol) server for Bitbucket Cloud with full API coverage",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "bitbucket-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swc src -d dist --strip-leading-paths",
+    "dev": "node --import @swc-node/register/esm-register src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "clean": "rm -rf dist",
+    "prepare": "husky",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bitbucket",
+    "atlassian",
+    "api",
+    "claude",
+    "ai",
+    "llm"
+  ],
+  "author": "Lexmata LLC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lexmata/bitbucket-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lexmata/bitbucket-mcp/issues"
+  },
+  "homepage": "https://lexmata.github.io/bitbucket-mcp",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@eslint/js": "^9.0.0",
+    "@swc-node/register": "^1.9.0",
+    "@swc/cli": "^0.3.12",
+    "@swc/core": "^1.4.0",
+    "@types/node": "^20.11.0",
+    "eslint": "^9.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

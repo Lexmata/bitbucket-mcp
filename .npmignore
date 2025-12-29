@@ -1,0 +1,70 @@
+# Source files (dist is published)
+src/
+tsconfig.json
+.swcrc
+eslint.config.js
+
+# Development configs
+.eslintcache
+.prettiercache
+.prettierrc
+.editorconfig
+
+# Tests
+__tests__/
+*.test.ts
+*.spec.ts
+coverage/
+.nyc_output/
+jest.config.*
+vitest.config.*
+
+# Documentation source (docs is published)
+*.md
+!README.md
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# GitHub
+.github/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Development dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+*.tgz
+*.tsbuildinfo
+
+# Misc
+tmp/
+temp/
+.tmp/
+.temp/
+.cache/
+.swc/
+
+# Examples
+examples/
