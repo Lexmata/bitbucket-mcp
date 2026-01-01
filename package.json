@@ -1,6 +1,6 @@
 {
   "name": "@lexmata/bitbucket-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP (Model Context Protocol) server for Bitbucket Cloud - 25+ tools for repositories, pull requests, branches, commits, issues, pipelines, and code search",
   "type": "module",
   "main": "dist/index.js",

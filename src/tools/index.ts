@@ -897,6 +897,8 @@ export class ToolHandler {
   }
 
   async handleTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+    // Authentication is handled automatically by the client
+    // It will trigger OAuth flow if needed when making API requests
     switch (name) {
       // Repository tools
       case 'list_repositories': {
