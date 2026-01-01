@@ -19,34 +19,15 @@ import { ResourceHandler } from './resources/index.js';
 const config = {
   clientId: process.env.BITBUCKET_CLIENT_ID ?? '',
   clientSecret: process.env.BITBUCKET_CLIENT_SECRET ?? '',
-  accessToken: process.env.BITBUCKET_ACCESS_TOKEN,
+  // Support both BITBUCKET_ACCESS_TOKEN and BITBUCKET_TOKEN for backwards compatibility
+  accessToken: process.env.BITBUCKET_ACCESS_TOKEN ?? process.env.BITBUCKET_TOKEN,
   refreshToken: process.env.BITBUCKET_REFRESH_TOKEN,
+  // For app password auth (Basic auth)
+  username: process.env.BITBUCKET_USERNAME,
 };
-
-// Validate configuration
-function validateConfig(): void {
-  // If access token is provided, we can work without OAuth credentials
-  if (config.accessToken) {
-    return;
-  }
-
-  // Otherwise, we need OAuth credentials
-  if (!config.clientId || !config.clientSecret) {
-    console.error('Error: Missing required configuration.');
-    console.error('');
-    console.error('Please set one of the following:');
-    console.error('  1. BITBUCKET_ACCESS_TOKEN (for direct token auth)');
-    console.error('  2. BITBUCKET_CLIENT_ID and BITBUCKET_CLIENT_SECRET (for OAuth)');
-    console.error('');
-    console.error('See README.md for setup instructions.');
-    process.exit(1);
-  }
-}
 
 // Create and start the MCP server
 async function main(): Promise<void> {
-  validateConfig();
-
   // Initialize OAuth and client
   const oauth = new BitbucketOAuth(config);
   const client = new BitbucketClient(oauth);

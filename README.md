@@ -11,7 +11,8 @@ A Model Context Protocol (MCP) server for Bitbucket Cloud - 25+ tools for reposi
 ## Features
 
 - **Full Bitbucket Cloud API Coverage**: Access repositories, pull requests, branches, commits, issues, pipelines, and code search
-- **OAuth 2.0 Authentication**: Secure authentication with automatic token refresh
+- **OAuth 2.0 Authentication**: Secure authentication with automatic browser-based sign-in and token refresh
+- **App Password Support**: Alternative authentication using Bitbucket App Passwords
 - **MCP Tools**: 25+ tools for interacting with Bitbucket
 - **MCP Resources**: Access repositories, pull requests, and files as resources
 - **TypeScript**: Fully typed for reliability and developer experience
@@ -31,34 +32,119 @@ yarn global add @lexmata/bitbucket-mcp
 
 ## Configuration
 
-### Option 1: Access Token (Recommended for personal use)
+### Option 1: OAuth 2.0 (Recommended)
 
-1. Go to Bitbucket Settings > Personal Settings > App passwords
-2. Create a new app password with the required permissions:
+OAuth provides the best experience with automatic browser-based authentication and token refresh.
+
+#### Step 1: Create an OAuth Consumer
+
+1. Go to your Bitbucket workspace: `https://bitbucket.org/{workspace}/workspace/settings/oauth-consumers`
+2. Click **"Add consumer"**
+3. Fill in:
+   - **Name**: `MCP Server` (or any name)
+   - **Callback URL**: `http://localhost:9876/callback` (required)
+   - **Permissions**: Select the following:
+     - Account: Read
+     - Repositories: Read, Write, Admin
+     - Pull requests: Read, Write
+     - Issues: Read, Write
+     - Pipelines: Read, Write
+4. Click **Save** and note the **Key** (Client ID) and **Secret** (Client Secret)
+
+#### Step 2: Run the OAuth Flow
+
+Use the included helper script to authenticate:
+
+```bash
+# From the project directory
+node scripts/oauth-flow.js "YOUR_CLIENT_ID" "YOUR_CLIENT_SECRET"
+```
+
+This will:
+
+1. Start a local callback server on port 9876
+2. Open your browser to Bitbucket's authorization page
+3. After you authorize, display the configuration to add to your MCP config
+
+#### Step 3: Configure Your MCP Client
+
+Add the output configuration to your MCP client config file.
+
+### Option 2: App Password (Simple setup)
+
+For personal use without OAuth setup:
+
+1. Go to Bitbucket: **Personal Settings** → **App passwords**
+2. Click **Create app password**
+3. Give it a name and select permissions:
    - Account: Read
    - Repositories: Read, Write, Admin
    - Pull requests: Read, Write
    - Issues: Read, Write
    - Pipelines: Read, Write
+4. Copy the generated password
 
-3. Set the environment variable:
+Configure with your Bitbucket username and the app password:
 
-```bash
-export BITBUCKET_ACCESS_TOKEN="your-app-password"
+```json
+{
+  "mcpServers": {
+    "bitbucket": {
+      "command": "npx",
+      "args": ["@lexmata/bitbucket-mcp"],
+      "env": {
+        "BITBUCKET_USERNAME": "your-username",
+        "BITBUCKET_ACCESS_TOKEN": "your-app-password"
+      }
+    }
+  }
+}
 ```
 
-### Option 2: OAuth 2.0 (Recommended for applications)
+## Usage with Cursor IDE
 
-1. Go to Bitbucket Settings > Workspace Settings > OAuth consumers
-2. Create a new OAuth consumer with:
-   - Callback URL: `http://localhost:8080/callback` (or your callback URL)
-   - Permissions: Select required scopes
+Add the following to your Cursor MCP configuration file:
 
-3. Set the environment variables:
+**Linux**: `~/.cursor/mcp.json`
+**macOS**: `~/.cursor/mcp.json`
+**Windows**: `%USERPROFILE%\.cursor\mcp.json`
 
-```bash
-export BITBUCKET_CLIENT_ID="your-client-id"
-export BITBUCKET_CLIENT_SECRET="your-client-secret"
+### With OAuth (Recommended)
+
+```json
+{
+  "mcpServers": {
+    "bitbucket": {
+      "command": "npx",
+      "args": ["@lexmata/bitbucket-mcp"],
+      "env": {
+        "BITBUCKET_CLIENT_ID": "your-client-id",
+        "BITBUCKET_CLIENT_SECRET": "your-client-secret",
+        "BITBUCKET_ACCESS_TOKEN": "your-access-token",
+        "BITBUCKET_REFRESH_TOKEN": "your-refresh-token"
+      }
+    }
+  }
+}
+```
+
+When tokens expire, the server will automatically refresh them using the refresh token. If refresh fails, a browser window will open for re-authentication.
+
+### With App Password
+
+```json
+{
+  "mcpServers": {
+    "bitbucket": {
+      "command": "npx",
+      "args": ["@lexmata/bitbucket-mcp"],
+      "env": {
+        "BITBUCKET_USERNAME": "your-username",
+        "BITBUCKET_ACCESS_TOKEN": "your-app-password"
+      }
+    }
+  }
+}
 ```
 
 ## Usage with Claude Desktop
@@ -76,7 +162,10 @@ Add the following to your Claude Desktop configuration file:
       "command": "npx",
       "args": ["@lexmata/bitbucket-mcp"],
       "env": {
-        "BITBUCKET_ACCESS_TOKEN": "your-access-token"
+        "BITBUCKET_CLIENT_ID": "your-client-id",
+        "BITBUCKET_CLIENT_SECRET": "your-client-secret",
+        "BITBUCKET_ACCESS_TOKEN": "your-access-token",
+        "BITBUCKET_REFRESH_TOKEN": "your-refresh-token"
       }
     }
   }
@@ -91,11 +180,45 @@ Or if installed globally:
     "bitbucket": {
       "command": "bitbucket-mcp",
       "env": {
-        "BITBUCKET_ACCESS_TOKEN": "your-access-token"
+        "BITBUCKET_USERNAME": "your-username",
+        "BITBUCKET_ACCESS_TOKEN": "your-app-password"
       }
     }
   }
 }
+```
+
+## Environment Variables
+
+| Variable                  | Description                        | Required         |
+| ------------------------- | ---------------------------------- | ---------------- |
+| `BITBUCKET_CLIENT_ID`     | OAuth consumer key                 | For OAuth        |
+| `BITBUCKET_CLIENT_SECRET` | OAuth consumer secret              | For OAuth        |
+| `BITBUCKET_ACCESS_TOKEN`  | OAuth access token or App password | Yes              |
+| `BITBUCKET_REFRESH_TOKEN` | OAuth refresh token                | For OAuth        |
+| `BITBUCKET_USERNAME`      | Bitbucket username                 | For App Password |
+
+## Token Management
+
+### OAuth Tokens
+
+- **Access tokens** expire after 2 hours
+- **Refresh tokens** are used to automatically obtain new access tokens
+- Tokens are persisted to `~/.config/bitbucket-mcp/tokens.json`
+- If tokens expire and refresh fails, the browser will automatically open for re-authentication
+
+### Re-authenticating
+
+If you need to re-authenticate manually:
+
+```bash
+node scripts/oauth-flow.js "YOUR_CLIENT_ID" "YOUR_CLIENT_SECRET"
+```
+
+Or delete the token file to trigger re-authentication:
+
+```bash
+rm ~/.config/bitbucket-mcp/tokens.json
 ```
 
 ## Available Tools
@@ -258,6 +381,70 @@ pnpm dev
 | `pnpm lint:fix`     | Fix ESLint issues            |
 | `pnpm format`       | Format code with Prettier    |
 | `pnpm format:check` | Check code formatting        |
+
+### OAuth Flow Helper
+
+The `scripts/oauth-flow.js` script provides a convenient way to authenticate:
+
+```bash
+node scripts/oauth-flow.js "CLIENT_ID" "CLIENT_SECRET"
+```
+
+This script:
+
+1. Starts a local HTTP server on port 9876
+2. Opens your browser to Bitbucket's authorization page
+3. Handles the OAuth callback
+4. Displays the complete MCP configuration with tokens
+
+## Troubleshooting
+
+### "Port 9876 is already in use"
+
+Another process is using the OAuth callback port. Either:
+
+- Close the other application using port 9876
+- Wait a moment and try again (previous OAuth attempt may still be running)
+
+```bash
+# Find and kill the process using port 9876
+lsof -ti:9876 | xargs kill -9
+```
+
+### "localhost:9876 returned not found"
+
+The OAuth callback URL in your Bitbucket consumer is incorrect. Make sure it's set to:
+
+```
+http://localhost:9876/callback
+```
+
+### "Token is invalid or expired"
+
+Your access token has expired. The server will automatically:
+
+1. Try to refresh using the refresh token
+2. If that fails, open the browser for re-authentication
+
+To manually re-authenticate:
+
+```bash
+node scripts/oauth-flow.js "YOUR_CLIENT_ID" "YOUR_CLIENT_SECRET"
+```
+
+### "Authentication failed (401)"
+
+Check that:
+
+1. Your OAuth consumer has the correct permissions
+2. Your app password (if using) has the required scopes
+3. For app passwords, ensure `BITBUCKET_USERNAME` is set
+
+### Server not loading in Cursor
+
+1. Verify your `~/.cursor/mcp.json` syntax is valid JSON
+2. Restart Cursor or reload the window
+3. Check the MCP server logs for errors
 
 ## License
 

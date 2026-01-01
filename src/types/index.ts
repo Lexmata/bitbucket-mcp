@@ -4,6 +4,8 @@ export interface OAuthConfig {
   clientSecret: string;
   accessToken?: string;
   refreshToken?: string;
+  // For app password auth (Basic auth) - requires username
+  username?: string;
 }
 
 export interface OAuthTokenResponse {
